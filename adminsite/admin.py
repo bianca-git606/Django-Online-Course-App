@@ -13,9 +13,10 @@ class LessonInline(admin.StackedInline):
     extra = 5
 
 class CourseAdmin(admin.ModelAdmin):
-    fields = ['pub_date', 'name', 'description']
+    fields = ['pub_date', 'name', 'description', 'image']
     inlines = [LessonInline]
 
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Instructor, InstructorAdmin)
+

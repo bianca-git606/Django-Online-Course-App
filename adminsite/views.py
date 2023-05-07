@@ -1,27 +1,32 @@
+from typing import Any
+from django.db import models
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Course, Lesson, Enrollment
 from django.urls import reverse
-from django.views import generic
+from django.views import generic, View
 from django.http import Http404
 
 
-# Create your views here.
-
 # display the top 10 popular courses
-def popular_course_list(request):
-    context = {}
 
-    if request.method == 'GET':
+class CourseListView(generic.ListView):
+
+    template_name = 'onlinecourse/course_list.html'
+    context_object_name = 'course_list'
+
+    def get_queryset(self):
         course_list = Course.objects.order_by('total_enrollment')[:10]
-        context['course_list'] = course_list
-        
-        return render(request, 'onlinecourse/course_list.html', context)
-    
-def enroll(request, course_id):
+        return course_list
 
-    if request.method == 'POST':
+
+
+class EnrollView(View):
+    
+    def post(self, request, *args, **kwargs):
+        
+        course_id = kwargs.get('course_id')
         # searching the course, if not found print a 404 error 
         chosen_course = get_object_or_404(Course, pk=course_id)
         # and updating the total enrollment
@@ -29,19 +34,23 @@ def enroll(request, course_id):
         chosen_course.save()
         # return an HTTP response redirecting user to course list view
         return HttpResponseRedirect(reverse(viewname='course_details', args=(chosen_course.id,)))
-    
 
-def course_details(request, course_id):
-    
-    context = {}
-    if request.method == 'GET':
-        try:
-            course = Course.objects.get(pk=course_id)
-            context['course'] = course
-            
-            return render(request, 'onlinecourse/course_details.html', context)
-        
-        except Course.DoesNotExist:
-            return Http404("No course found with that course ID")
+
+class CourseDetailsView(View):
+
+    def get(self, request, *args, **kwargs):
+
+        context = {}
+        # get the param
+        course_id = kwargs.get("course_id")
+        # returns a 404 error if not exists
+        course = get_object_or_404(Course, pk=course_id)
+        context["course"] = course
+        return render(request, 'onlinecourse/course_details.html', context)
+
+
+
+
+
 
 

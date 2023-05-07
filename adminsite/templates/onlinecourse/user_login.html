@@ -11,14 +11,18 @@
     <title>Document</title>
 </head>
 <body>
-    {% for lesson in course.lesson_set.all %}
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title" >Lesson {{lesson.title}}</h4>
-            <p>{{lesson.content}}</p>
+    <form action="{% url 'login' %}"  method="post">
+        {% csrf_token %}
+        <div class="container">
+          <h1>Login</h1>
+          <label for="username"><b>User Name</b></label>
+          <input type="text" placeholder="Enter User Name: " name="username" required>
+          <label for="psw"><b>Password</b></label>
+          <input type="password" placeholder="Enter Password: " name="psw" required>
+          <div>
+            <button class="button" type="submit">Login</button>
+          </div>
         </div>
-    </div>
-{% endfor %}
+      </form>
 </body>
 </html>
-

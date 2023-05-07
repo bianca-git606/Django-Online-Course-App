@@ -7,57 +7,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'adminsite/course.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <title>Document</title>
 </head>
 <body>
-
-    {% if user.is_authenticated %}
-    <div class="rightalign">
-        <div class="dropdown">
-            <button class="dropbtn">{{user.first_name}}</button>
-            <div class="dropdown-content">
-                <a href="{% url 'logout' %}">Logout</a>
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Online Course</a>
             </div>
+            <ul class="nav navbar-nav navbar-right">
+                {% if user.is_authenticated %}
+                <li>
+                    <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                    <a class="btn btn-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                    <form class="form-inline" action="{% url 'login' %}" method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Username" name="username" >
+                            <input type="password" class="form-control" placeholder="Password" name="psw" >
+                            <button class="btn btn-primary" type="submit">Login</button>
+                            <a class="btn btn-link" href="{% url 'registration' %}">Sign Up</a>
+                        </div>
+                    </form>
+                </li>
+                {% endif %}
+            </ul>
         </div>
-    </div>
-    {% else %}
-    <div class="rightalign">
-        <div class="dropdown">
-            <button class="dropbtn">Visitor</button>
-            <div class="dropdown-content">
-                <a href="{% url 'registration' %}">Signup</a>
-                <a href="{% url 'login' %}">Login</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    {% if course_list%}
-        <ul>
+    </nav>
+    {% if course_list %}
+    <div class="container"> <!--Style root div with .container class -->
+        <div class="card-deck"> <!--Style second div with .card-deck class -->
             {% for course in course_list %}
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4 col-12">
-                        <img class="rounded float-left" src="{{ MEDIA_URL}}/{{course.image}}" width="260" height="260">
-                    </div>
-                    <div class="col-lg-8 col-12">
-                        <h1 class="xlarge-font"> {{course.name}} </h1>
-                        <p style="color:MediumSeaGreen;"> {{course.total_enrollment}} enrolled</p>
-                        <p> {{course.description}} </p>
-                        <form action="{% url 'enroll' course.id %}" method="POST">
-                            {% csrf_token %}
-                            <input class="btn btn-success btn-xl" type="submit" value="Enroll now">
-                        </form>   
-                    </div>
+            <div class="card" style="width: 36rem;"> <!--Style third level div with .card class -->
+                <img class="card-img-left" src="{{MEDIA_URL}}/{{ course.image }}" width="240px" height="240px"
+                           alt="Course image"> <!--Style card image with .card-img-left class -->
+                <div class="card-body bg-light"> <!--Style root div with .card-body and .bg-light class -->
+                    <h5 class="card-title">{{ course.name }}, <span class="text-success"> <!--Style h5 with .card-title and span with .text-success class -->
+                              {{ course.total_enrollment}} enrolled</span></h5>
+                    <p class="card-text">{{ course.description}}</p> <!--Style card description with .card-text class -->
+                    <form action="{% url 'enroll' course.id %}" method="post">
+                        {% csrf_token %}
+                        <input class="btn btn-primary" type="submit"
+                               value="Enroll"> <!--Style Enroll button with .btn and .btn-primary class -->
+                    </form>
                 </div>
             </div>
-            <hr>
             {% endfor %}
-        </ul>
-    {% else %}
-    <p>No courses available</p>
-    {% endif %}
+        </div>
+    </div>
+{% else %}
+    <p>No courses are available.</p>
+
+{% endif %}
 </body>
 </html>
